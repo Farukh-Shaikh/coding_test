@@ -39,6 +39,9 @@ public class TransactionRecord {
     public double getAmount() {
         return amount;
     }
+    public String getSenderFullName() {
+        return senderFullName;
+    }
 
 }
 

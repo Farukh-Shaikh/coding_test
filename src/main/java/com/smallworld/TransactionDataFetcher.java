@@ -29,14 +29,27 @@ public class TransactionDataFetcher {
      * Returns the sum of the amounts of all transactions sent by the specified client
      */
     public double getTotalTransactionAmountSentBy(String senderFullName) {
-        throw new UnsupportedOperationException();
+        double totalAmountBySender = 0.0;
+        for (TransactionRecord transaction : transactions) {
+            if (transaction.getSenderFullName().equals(senderFullName)) {
+                totalAmountBySender += transaction.getAmount();
+            }
+        }
+        return totalAmountBySender;
     }
 
     /**
      * Returns the highest transaction amount
      */
     public double getMaxTransactionAmount() {
-        throw new UnsupportedOperationException();
+        double maxAmount = Double.MIN_VALUE;
+        for (TransactionRecord transaction : transactions) {
+            if (transaction.getAmount() > maxAmount) {
+                maxAmount = transaction.getAmount();
+            }
+        }
+        return maxAmount;
+
     }
 
     /**
