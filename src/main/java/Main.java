@@ -53,10 +53,10 @@ public class Main {
         }
 
         // most total sent amount
-        Optional<TransactionRecord> topSender = dataFetcher.getTopSender();
+        Optional<Map.Entry<String, Double>> topSenderEntry = dataFetcher.getTopSender();
         System.out.println("\nSender with Most Total Sent Amount:");
-        topSender.ifPresentOrElse(
-                System.out::println,
+        topSenderEntry.ifPresentOrElse(
+                entry -> System.out.println("Name: " + entry.getKey() + ", Total Amount: " + entry.getValue()),
                 () -> System.out.println("No transactions found.")
         );
 

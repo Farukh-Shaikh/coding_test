@@ -135,20 +135,19 @@ public class TransactionDataFetcher {
     /**
      * Returns the sender with the most total sent amount
      */
-    public Optional<TransactionRecord> getTopSender() {
-        Map<String, Double> totalSentAmount = new HashMap<>();
+    public Optional<Map.Entry<String, Double>> getTopSender() {
+        // Create a map to store the total sent amount for each sender
+        Map<String, Double> totalSentAmountBySender = new HashMap<>();
 
-        // Calculate the total sent amount
+        // Calculate the total sent amount for each sender
         for (TransactionRecord transaction : transactions) {
             String senderFullName = transaction.getSenderFullName();
-            // add total sent amount by sender
-            totalSentAmount.put(senderFullName, totalSentAmount.getOrDefault(senderFullName, 0.0) + transaction.getAmount());
+            totalSentAmountBySender.put(senderFullName, totalSentAmountBySender.getOrDefault(senderFullName, 0.0) + transaction.getAmount());
         }
 
-        // Find the sender with the most total sent amount with Optional
-        Optional<Map.Entry<String, Double>> topSenderEntry = totalSentAmount.entrySet().stream().max(Map.Entry.comparingByValue());
-
-        return topSenderEntry.map(entry -> transactions.stream().filter(transaction -> transaction.getSenderFullName().equals(entry.getKey())).findFirst().orElse(null));
+        // Find the sender with the most total sent amount
+        return totalSentAmountBySender.entrySet().stream()
+                .max(Map.Entry.comparingByValue());
     }
 
 }

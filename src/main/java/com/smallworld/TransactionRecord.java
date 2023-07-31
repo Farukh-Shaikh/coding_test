@@ -63,7 +63,19 @@ public class TransactionRecord {
         return issueMessage;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("MTN: ").append(mtn).append(", Amount: ").append(amount).append(", Sender: ").append(senderFullName).append(", Age: ").append(senderAge).append(", Beneficiary: ").append(beneficiaryFullName).append(", Age: ").append(beneficiaryAge).append(", Issue: ").append(issueId != null ? issueId : "No Issue");
 
+        if (issueId != null) {
+            sb.append(", Solved: ").append(issueSolved);
+            if (issueMessage != null) {
+                sb.append(", Messages: ").append(issueMessage);
+            }
+        }
+        return sb.toString();
+    }
 }
 
 
