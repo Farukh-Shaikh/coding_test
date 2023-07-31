@@ -4,15 +4,13 @@ import com.smallworld.TransactionRecord;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
         List<TransactionRecord> transactions = readTransactions("transactions.json");
 
+        //checking if transactions are found and parsed
         if(transactions == null){
             System.out.println("No transactions found");
         }
@@ -46,6 +44,21 @@ public class Main {
         // print messages of solved issues
         List<String> solvedIssueMessages = dataFetcher.getAllSolvedIssueMessages();
         System.out.println("Solved Messages: " + solvedIssueMessages);
+
+        // Get the top 3 transactions
+        List<TransactionRecord> top3Transactions = dataFetcher.getTop3TransactionsByAmount();
+        System.out.println("\nTop 3 Transactions by Amount:");
+        for (TransactionRecord transaction : top3Transactions) {
+            System.out.println(transaction);
+        }
+
+        // most total sent amount
+        Optional<TransactionRecord> topSender = dataFetcher.getTopSender();
+        System.out.println("\nSender with Most Total Sent Amount:");
+        topSender.ifPresentOrElse(
+                System.out::println,
+                () -> System.out.println("No transactions found.")
+        );
 
     }
 

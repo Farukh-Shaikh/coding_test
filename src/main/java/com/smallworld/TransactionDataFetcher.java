@@ -126,15 +126,29 @@ public class TransactionDataFetcher {
     /**
      * Returns the 3 transactions with highest amount sorted by amount descending
      */
-    public List<Object> getTop3TransactionsByAmount() {
-        throw new UnsupportedOperationException();
+    public List<TransactionRecord> getTop3TransactionsByAmount() {
+        // Sort in desc by amount
+        transactions.sort(Comparator.comparingDouble(TransactionRecord::getAmount).reversed());
+        return transactions.subList(0, 3);
     }
 
     /**
      * Returns the sender with the most total sent amount
      */
-    public Optional<Object> getTopSender() {
-        throw new UnsupportedOperationException();
+    public Optional<TransactionRecord> getTopSender() {
+        Map<String, Double> totalSentAmount = new HashMap<>();
+
+        // Calculate the total sent amount
+        for (TransactionRecord transaction : transactions) {
+            String senderFullName = transaction.getSenderFullName();
+            // add total sent amount by sender
+            totalSentAmount.put(senderFullName, totalSentAmount.getOrDefault(senderFullName, 0.0) + transaction.getAmount());
+        }
+
+        // Find the sender with the most total sent amount with Optional
+        Optional<Map.Entry<String, Double>> topSenderEntry = totalSentAmount.entrySet().stream().max(Map.Entry.comparingByValue());
+
+        return topSenderEntry.map(entry -> transactions.stream().filter(transaction -> transaction.getSenderFullName().equals(entry.getKey())).findFirst().orElse(null));
     }
 
 }
