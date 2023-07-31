@@ -6,12 +6,23 @@ import java.util.Optional;
 import java.util.Set;
 
 public class TransactionDataFetcher {
+    private List<TransactionRecord> transactions;
+
+    // Constructor
+    public TransactionDataFetcher(List<TransactionRecord> transactions) {
+        this.transactions = transactions;
+    }
 
     /**
      * Returns the sum of the amounts of all transactions
      */
     public double getTotalTransactionAmount() {
-        throw new UnsupportedOperationException();
+        double totalAmount = 0.0;
+        for (TransactionRecord transaction : transactions) {
+            totalAmount += transaction.getAmount();
+        }
+        return totalAmount;
+
     }
 
     /**
