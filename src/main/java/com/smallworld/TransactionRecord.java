@@ -43,6 +43,27 @@ public class TransactionRecord {
         return senderFullName;
     }
 
+    public String getBeneficiaryFullName() {
+        return beneficiaryFullName;
+    }
+
+    public int getBeneficiaryAge() {
+        return beneficiaryAge;
+    }
+
+    public Integer getIssueId() {
+        return issueId;
+    }
+
+    public boolean isIssueSolved() {
+        return issueSolved;
+    }
+
+    public String getIssueMessage() {
+        return issueMessage;
+    }
+
+
 }
 
 

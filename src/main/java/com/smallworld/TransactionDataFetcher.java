@@ -1,9 +1,6 @@
 package com.smallworld;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class TransactionDataFetcher {
     private List<TransactionRecord> transactions;
@@ -55,8 +52,15 @@ public class TransactionDataFetcher {
     /**
      * Counts the number of unique clients that sent or received a transaction
      */
-    public long countUniqueClients() {
-        throw new UnsupportedOperationException();
+    public int countUniqueClients() {
+        //using set to get unique records
+        Set<String> uniqueClients = new HashSet<>();
+        for (TransactionRecord transaction : transactions) {
+            uniqueClients.add(transaction.getSenderFullName());
+            uniqueClients.add(transaction.getBeneficiaryFullName());
+        }
+        return uniqueClients.size();
+
     }
 
     /**
@@ -64,28 +68,59 @@ public class TransactionDataFetcher {
      * issue that has not been solved
      */
     public boolean hasOpenComplianceIssues(String clientFullName) {
-        throw new UnsupportedOperationException();
+        for (TransactionRecord transaction : transactions) {
+            if (transaction.getSenderFullName().equals(clientFullName) || transaction.getBeneficiaryFullName().equals(clientFullName)) {
+                if (!transaction.isIssueSolved()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
      * Returns all transactions indexed by beneficiary name
      */
-    public Map<String, Object> getTransactionsByBeneficiaryName() {
-        throw new UnsupportedOperationException();
+    public Map<String, List<TransactionRecord>> getTransactionsByBeneficiaryName() {
+        //using hashmap to store transactions
+        Map<String, List<TransactionRecord>> transactionsByBeneficiaryName = new HashMap<>();
+        for (TransactionRecord transaction : transactions) {
+            //add all transactions with beneficiary Name
+            String beneficiaryName = transaction.getBeneficiaryFullName();
+            if (!transactionsByBeneficiaryName.containsKey(beneficiaryName)) {
+                transactionsByBeneficiaryName.put(beneficiaryName, new ArrayList<>());
+            }
+            transactionsByBeneficiaryName.get(beneficiaryName).add(transaction);
+        }
+        return transactionsByBeneficiaryName;
     }
 
     /**
      * Returns the identifiers of all open compliance issues
      */
     public Set<Integer> getUnsolvedIssueIds() {
-        throw new UnsupportedOperationException();
+        //getting ids of all issues
+        Set<Integer> unsolvedIssueIds = new HashSet<>();
+        for (TransactionRecord transaction : transactions) {
+            if (!transaction.isIssueSolved() && transaction.getIssueId() != null) {
+                unsolvedIssueIds.add(transaction.getIssueId());
+            }
+        }
+        return unsolvedIssueIds;
     }
 
     /**
      * Returns a list of all solved issue messages
      */
     public List<String> getAllSolvedIssueMessages() {
-        throw new UnsupportedOperationException();
+        List<String> solvedIssueMessages = new ArrayList<>();
+        for (TransactionRecord transaction : transactions) {
+            //check if issue is solved and message is not null
+            if (transaction.isIssueSolved() && transaction.getIssueMessage() != null) {
+                solvedIssueMessages.add(transaction.getIssueMessage());
+            }
+        }
+        return solvedIssueMessages;
     }
 
     /**

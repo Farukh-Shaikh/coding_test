@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
@@ -29,6 +31,22 @@ public class Main {
         // Calculate max amount
         double maxAmount = dataFetcher.getMaxTransactionAmount();
         System.out.println("Maximum Transaction Amount: " + maxAmount);
+
+        // print the count of unique clients
+        int uniqueClientsCount = dataFetcher.countUniqueClients();
+        System.out.println("Count of Unique Clients: " + uniqueClientsCount);
+
+        // Get transactions by beneficiary names
+        Map<String, List<TransactionRecord>> transactionsByBeneficiaryName = dataFetcher.getTransactionsByBeneficiaryName();
+
+        // print ids of open issues
+        Set<Integer> unsolvedIssueIds = dataFetcher.getUnsolvedIssueIds();
+        System.out.println("Unsolved Issues: " + unsolvedIssueIds);
+
+        // print messages of solved issues
+        List<String> solvedIssueMessages = dataFetcher.getAllSolvedIssueMessages();
+        System.out.println("Solved Messages: " + solvedIssueMessages);
+
     }
 
 
