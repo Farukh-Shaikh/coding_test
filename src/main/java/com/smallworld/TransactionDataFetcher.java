@@ -1,6 +1,7 @@
 package com.smallworld;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TransactionDataFetcher {
     private List<TransactionRecord> transactions;
@@ -14,11 +15,7 @@ public class TransactionDataFetcher {
      * Returns the sum of the amounts of all transactions
      */
     public double getTotalTransactionAmount() {
-        double totalAmount = 0.0;
-        for (TransactionRecord transaction : transactions) {
-            totalAmount += transaction.getAmount();
-        }
-        return totalAmount;
+        return transactions.stream().mapToDouble(TransactionRecord::getAmount).sum();
 
     }
 
@@ -26,26 +23,20 @@ public class TransactionDataFetcher {
      * Returns the sum of the amounts of all transactions sent by the specified client
      */
     public double getTotalTransactionAmountSentBy(String senderFullName) {
-        double totalAmountBySender = 0.0;
-        for (TransactionRecord transaction : transactions) {
-            if (transaction.getSenderFullName().equals(senderFullName)) {
-                totalAmountBySender += transaction.getAmount();
-            }
-        }
-        return totalAmountBySender;
+        return transactions.stream()
+                .filter(transaction -> transaction.getSenderFullName().equals(senderFullName))
+                .mapToDouble(TransactionRecord::getAmount)
+                .sum();
     }
 
     /**
      * Returns the highest transaction amount
      */
     public double getMaxTransactionAmount() {
-        double maxAmount = Double.MIN_VALUE;
-        for (TransactionRecord transaction : transactions) {
-            if (transaction.getAmount() > maxAmount) {
-                maxAmount = transaction.getAmount();
-            }
-        }
-        return maxAmount;
+        return transactions.stream()
+                .mapToDouble(TransactionRecord::getAmount)
+                .max()
+                .orElse(0.0);
 
     }
 
@@ -68,14 +59,10 @@ public class TransactionDataFetcher {
      * issue that has not been solved
      */
     public boolean hasOpenComplianceIssues(String clientFullName) {
-        for (TransactionRecord transaction : transactions) {
-            if (transaction.getSenderFullName().equals(clientFullName) || transaction.getBeneficiaryFullName().equals(clientFullName)) {
-                if (!transaction.isIssueSolved()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return transactions.stream()
+                .filter(transaction -> clientFullName.equals(transaction.getSenderFullName())
+                        || clientFullName.equals(transaction.getBeneficiaryFullName()))
+                .anyMatch(transaction -> transaction.getIssueId() != null && !transaction.isIssueSolved());
     }
 
     /**
@@ -100,27 +87,21 @@ public class TransactionDataFetcher {
      */
     public Set<Integer> getUnsolvedIssueIds() {
         //getting ids of all issues
-        Set<Integer> unsolvedIssueIds = new HashSet<>();
-        for (TransactionRecord transaction : transactions) {
-            if (!transaction.isIssueSolved() && transaction.getIssueId() != null) {
-                unsolvedIssueIds.add(transaction.getIssueId());
-            }
-        }
-        return unsolvedIssueIds;
+        return transactions.stream()
+                .filter(transaction -> transaction.getIssueId() != null && !transaction.isIssueSolved())
+                .map(TransactionRecord::getIssueId)
+                .collect(Collectors.toSet());
+
     }
 
     /**
      * Returns a list of all solved issue messages
      */
     public List<String> getAllSolvedIssueMessages() {
-        List<String> solvedIssueMessages = new ArrayList<>();
-        for (TransactionRecord transaction : transactions) {
-            //check if issue is solved and message is not null
-            if (transaction.isIssueSolved() && transaction.getIssueMessage() != null) {
-                solvedIssueMessages.add(transaction.getIssueMessage());
-            }
-        }
-        return solvedIssueMessages;
+        return transactions.stream()
+                .filter(transaction -> transaction.getIssueId() != null && transaction.isIssueSolved())
+                .map(TransactionRecord::getIssueMessage)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -128,8 +109,11 @@ public class TransactionDataFetcher {
      */
     public List<TransactionRecord> getTop3TransactionsByAmount() {
         // Sort in desc by amount
-        transactions.sort(Comparator.comparingDouble(TransactionRecord::getAmount).reversed());
-        return transactions.subList(0, 3);
+        return transactions.stream()
+                .sorted(Comparator.comparingDouble(TransactionRecord::getAmount).reversed())
+                .limit(3)
+                .collect(Collectors.toList());
+
     }
 
     /**
@@ -137,15 +121,12 @@ public class TransactionDataFetcher {
      */
     public Optional<Map.Entry<String, Double>> getTopSender() {
         // Create a map to store the total sent amount for each sender
-        Map<String, Double> totalSentAmountBySender = new HashMap<>();
+        Map<String, Double> totalSentAmountBySender = transactions.stream()
+                .collect(Collectors.groupingBy(
+                        TransactionRecord::getSenderFullName,
+                        Collectors.summingDouble(TransactionRecord::getAmount)
+                ));
 
-        // Calculate the total sent amount for each sender
-        for (TransactionRecord transaction : transactions) {
-            String senderFullName = transaction.getSenderFullName();
-            totalSentAmountBySender.put(senderFullName, totalSentAmountBySender.getOrDefault(senderFullName, 0.0) + transaction.getAmount());
-        }
-
-        // Find the sender with the most total sent amount
         return totalSentAmountBySender.entrySet().stream()
                 .max(Map.Entry.comparingByValue());
     }
